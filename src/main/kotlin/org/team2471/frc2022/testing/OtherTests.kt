@@ -20,32 +20,15 @@ suspend fun Shooter.pitchTest() = use(this) {
     }
 }
 
-suspend fun Climb.pivotTest() = use(this) {
-    periodic {
-        angleSetPower((OI.driveRightTrigger - OI.driveLeftTrigger) * 0.4)
-    }
-}
-
 suspend fun Climb.motorTest() = use(this) {
     var power = OI.driveLeftTrigger - OI.driveRightTrigger
     periodic {
         power = OI.driveLeftTrigger - OI.driveRightTrigger
-        angleSetPower(power)
         println("angle power: $power")
         setPower((OI.operatorRightTrigger - OI.operatorLeftTrigger) * 0.5)
     }
 }
 
-suspend fun Climb.anglePIDTest() = use(this){
-    var setpoint = 0.0
-    periodic {
-        setpoint = (OI.operatorController.leftThumbstickY * 10.0 ) + 15.0
-        angleSetpoint = setpoint
-        updatePositions()
-        println("climb setpoint: $setpoint                      climb angle output ${angleMotor.output}")
-
-    }
-}
 
 suspend fun Intake.pivotTest() = use(this) {
     periodic {
@@ -57,8 +40,7 @@ suspend fun Intake.pivotTest() = use(this) {
 
 suspend fun Climb.adjustmentTest() = use(this) {
     periodic {
-        heightSetpoint -= OI.operatorController.leftThumbstickY * (12.0 / 50.0)
-        angleSetpoint -= OI.operatorController.rightThumbstickX * (20.0 / 50.0)
+        heightSetpoint1 -= OI.operatorController.leftThumbstickY * (12.0 / 50.0)
     }
 }
 
@@ -105,47 +87,6 @@ suspend fun Drive.currentTest() = use(this) {
 }
 
 suspend fun systemsCheck() = use(Intake, Feeder, Shooter, Climb, Limelight) {
-}
-
-suspend fun climbPoseTest() = use(Climb) {
-    println("in climbPoseTest")
-    goToPose(Pose.TRAVERSE_PULL_MID)
-    suspendUntil{ OI.operatorController.x }
-    println("x pressed")
-}
-
-suspend fun Climb.currentTest() = use(this) {
-    var f = 0.0
-    var upPressed = false
-    var downPressed = false
-    periodic {
-        if (OI.driverController.dPad == Controller.Direction.UP) {
-            upPressed = true
-        } else if (OI.driverController.dPad == Controller.Direction.DOWN) {
-            downPressed = true
-        }
-        if (OI.driverController.dPad != Controller.Direction.UP && upPressed) {
-            upPressed = false
-            f += 0.01
-        }
-        if (OI.driverController.dPad != Controller.Direction.DOWN && downPressed) {
-            downPressed = false
-            f -= 0.01
-        }
-//        for (moduleCount in 0..3) {
-//            val module = modules[moduleCount] as Drive.Module
-//        }
-//        println()
-//        println("power: $power")
-        angleMotor.setPositionSetpoint(25.0, f)
-//        angleSetPower(f)
-        println("current: ${round(angleMotor.current, 2)}  f: $f")
-//        drive(
-//            Vector2(0.0, power),
-//            0.0,
-//            false
-//        )
-    }
 }
 
 suspend fun Intake.pivotFeedForwardTest() {

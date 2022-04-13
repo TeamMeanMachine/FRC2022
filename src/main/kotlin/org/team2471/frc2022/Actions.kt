@@ -5,7 +5,6 @@ import org.team2471.frc.lib.coroutines.parallel
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.coroutines.suspendUntil
 import org.team2471.frc.lib.framework.use
-import org.team2471.frc.lib.util.AllianceStation
 import org.team2471.frc.lib.util.Timer
 import kotlin.math.absoluteValue
 
@@ -211,35 +210,33 @@ suspend fun shootTest2() = use(Shooter, Feeder) {
 
 suspend fun goToPose(targetPose: Pose, fullCurve: Boolean = false, minTime: Double = 0.0) = use(Climb) {
     val time = if (fullCurve) {
-        maxOf(minTime, Climb.angleChangeTime(targetPose.angle), Climb.heightChangeTime(targetPose.height))
+        maxOf(minTime, Climb.heightChangeTime(Climb.height1, targetPose.height1), Climb.heightChangeTime(Climb.height2, targetPose.height2))
     } else {
         minTime
     }
-    println("Pose Values: $time ${targetPose.height} ${targetPose.angle}")
+    println("Pose Values: $time ${targetPose.height1} ${targetPose.height2}")
     parallel({
-        Climb.changeHeight(targetPose.height, time)
-    }, {
-        Climb.changeAngle(targetPose.angle, time)
+        Climb.changeHeight1(targetPose.height1, time)
+    },
+    {
+        Climb.changeHeight2(targetPose.height2, time)
     })
 }
 
 suspend fun climbPrep() = use(Climb) {
     println("trying to climbprep")
+
     Feeder.autoFeedMode = false
     if (Climb.climbIsPrepped){
         Climb.climbIsPrepped = false
         println("FUN")
         delay(0.5)
     } else {
-
         Climb.climbMode = true
-        Climb.setStatusFrames(forClimb = true)
-        Climb.changeAngle(8.0, 0.3)
 
         climbPrepOther()
         goToPose(Pose.CLIMB_PREP)
         Climb.climbIsPrepped = true
-        Climb.bungeeTakeOver = true
         println("climb is prepped")
         suspendUntil { OI.operatorController.rightBumper || !Climb.climbIsPrepped }
         if (Climb.climbIsPrepped) {
@@ -251,7 +248,7 @@ suspend fun climbPrep() = use(Climb) {
 suspend fun climbPrepOther () = use(Shooter, Intake) {
     parallel({
         Intake.setIntakePower(0.0)
-        Intake.changeAngle(Intake.PIVOT_BOTTOM)
+        Intake.changeAngle(Intake.PIVOT_TOP)
     }, {
         Shooter.changeAngle(Shooter.PITCH_LOW)
     })
@@ -263,82 +260,26 @@ suspend fun performClimb() {
     if (Climb.climbIsPrepped) {
         //println("Climb stage executing: ${Climb.climbStage} roll: ${Climb.roll}")
         OI.operatorController.rumble = 0.5
-        var loop = 0
         var lasTroll = Climb.roll
         while (Climb.climbIsPrepped) {
             Climb.climbStage = 0
-            while (Climb.climbStage < 6 && Climb.climbIsPrepped) {
+            while (Climb.climbStage < 2 && Climb.climbIsPrepped) {
                 if (OI.operatorController.rightBumper) {  //rightBumper instead of leftTrigger
-                    if (loop == 0) Climb.bungeeTakeOver = false
-                    println("Trigger climb stage ${Climb.climbStage}, loop $loop, roll is ${Climb.roll}")
+                    println("Trigger climb stage ${Climb.climbStage}, roll is ${Climb.roll}")
                     when (Climb.climbStage) {
-                        0 -> {
-//                            Climb.angleMotor.brakeMode()
-                            goToPose(Pose.PULL_UP)
-                            if (loop > 0) delay(0.1)
-                        }
                         1 -> {
-                            goToPose(Pose.PULL_UP_LATCH, false, 0.5)
-                            delay(0.1)
-                            if (Shooter.allianceColor == Shooter.BLUE) {
-                                println("Climb Blue")
-                                goToPose(Pose.PULL_UP_LATCH_LIFT, false, 0.7)
-                            } else {
-                                println("Climb red")
-                                goToPose(Pose.PULL_UP_LATCH_LIFT, false, 0.5)
-                            }
-                            goToPose(Pose.PULL_UP_LATCH_RELEASE, true)
-                            if (loop == 0) {
-                                delay(0.1)
-                            } else {
-                                periodic {
-                                    if ((lasTroll - Climb.roll < 0.0 && Climb.roll > 10.0) || !Climb.climbIsPrepped || OI.driverController.y)
-                                        stop()
-                                }
-                                lasTroll = Climb.roll
-                                delay(0.1)
-                            }
+                            goToPose(Pose.CLIMB_HIGH_BAR)
                         }
+
                         2 -> {
-                            goToPose(Pose.EXTEND_HOOKS)
-//                            if (loop == 0) {
-//                                delay(0.5)
-//                            } else {
-                                val angleTimer = Timer()
-                                var hit25 = false
-                                angleTimer.start()
-                                periodic {
-                                    if (!hit25 && Climb.roll > 25.0 && Climb.climbIsPrepped) {
-                                        hit25 = true
-                                        println("hit 30, angle ${Climb.angle}")
-                                    }
-                                    val deltaRoll = Climb.roll - lasTroll
-//                                    var maxRoll = if (loop == 0) 18.0 else 15.0
-                                    if ((deltaRoll > -3.0 && deltaRoll < 1.0 && Climb.angle > 25.0 && Climb.roll < 15.0) || !Climb.climbIsPrepped) {
-                                        println("Angle ${angleTimer.get()} Roll ${Climb.roll} DeltaRoll $deltaRoll")
-                                        stop()
-                                    }
-                                    lasTroll = Climb.roll
-                                }
-//                            }
+                            goToPose(Pose.CLIMB_TRAVERSE)
                         }
-                        3 -> {
-                            goToPose(Pose.TRAVERSE_ENGAGE)
-//                            delay(0.2)
-                            if (loop == 0) delay(0.2) else delay(0.1)
-                        }
-                        4 -> {
-                            goToPose(Pose.TRAVERSE_PULL_MID, false, 0.5)
-                            if (loop == 0) delay(0.24) else delay(0.04)
-                        }
-                        5 -> goToPose(Pose.TRAVERSE_PULL_UP, false, 0.5)
 
                         else -> println("Climb Stage Complete")
                     }
                 }
                 Climb.climbStage += 1
             }
-            loop += 1
         }
     }
     OI.operatorController.rumble = 0.0
