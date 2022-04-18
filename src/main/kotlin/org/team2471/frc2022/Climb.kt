@@ -1,17 +1,14 @@
 package org.team2471.frc2022
 
-import com.ctre.phoenix.motorcontrol.StatusFrame
 import edu.wpi.first.networktables.NetworkTableInstance
 import edu.wpi.first.wpilibj.Timer
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.team2471.frc.lib.actuators.FalconID
 import org.team2471.frc.lib.actuators.MotorController
-import org.team2471.frc.lib.control.PDController
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.Subsystem
 import org.team2471.frc.lib.motion_profiling.MotionCurve
-import org.team2471.frc.lib.units.degrees
 import org.team2471.frc.lib.units.radians
 import kotlin.math.absoluteValue
 
@@ -51,7 +48,7 @@ object Climb : Subsystem("Climb") {
 
     val tuningMode = false
 
-    const val HEIGHT_TOP = 30.5
+    const val HEIGHT_TOP = 24.5
     const val HEIGHT_BOTTOM = 0.0
 
     val roll : Double
@@ -60,8 +57,8 @@ object Climb : Subsystem("Climb") {
     init {
         heightMotor1.config {
             brakeMode()
-            inverted(true)
-            feedbackCoefficient = 3.14 / 2048.0 / 9.38 * 28.5 / 25.5
+            inverted(false)
+            feedbackCoefficient =  3.14 / 2048.0 / 16.0 * 23.8 / 21.6
             pid {
                 p(0.00000002)
             }
@@ -69,8 +66,8 @@ object Climb : Subsystem("Climb") {
 
         heightMotor2.config {
             brakeMode()
-            inverted(false)
-            feedbackCoefficient = 3.14 / 2048.0 / 9.38 * 28.5 / 25.5
+            inverted(true)
+            feedbackCoefficient = 3.14 / 2048.0 / 16.0 * 23.8 / 21.6
             pid {
                 p(0.00000002)
             }
@@ -88,16 +85,33 @@ object Climb : Subsystem("Climb") {
                     heightMotorOutput1.setDouble(heightMotor1.output)
                     heightMotorOutput2.setDouble(heightMotor2.output)
 
-                    if (OI.operatorLeftY.absoluteValue > 0.1 && climbMode) heightSetpoint1 -= OI.operatorLeftY * 0.45
-                    if ((OI.operatorLeftTrigger > 0.1 || OI.operatorRightTrigger > 0.1)) {  //!climbMode commented out to allow for zeroing in climbMode
-                        setPower((OI.operatorLeftTrigger - OI.operatorRightTrigger) * 0.5)
-                    } else {
-                        if (heightSetpoint1 > 1.5 && !climbMode) {
-                            heightSetpoint1 -= 0.05
-                        } else if (heightSetpoint1 < 1.0 && !climbMode) {
-                            heightSetpoint1 = 1.0
+                    if (OI.operatorLeftY.absoluteValue > 0.1) {
+                        if (climbMode) {
+                            heightSetpoint1 -= OI.operatorLeftY * 0.45
+                        } else {
+                            setPower1(-OI.operatorLeftY)
                         }
+                    }
+                    if (OI.operatorRightY.absoluteValue > 0.1) {
+                        if (climbMode) {
+                            heightSetpoint2 -= OI.operatorRightY * 0.45
+                        } else {
+                            setPower2(-OI.operatorRightY)
+                        }
+                    }
+                    if (heightSetpoint1 > 1.5 && !climbMode) {
+                        heightSetpoint1 -= 0.05
+                    } else if (heightSetpoint1 < 1.0 && !climbMode) {
+                        heightSetpoint1 = 1.0
+                    }
+                    if (heightSetpoint2 > 1.5 && !climbMode) {
+                        heightSetpoint2 -= 0.05
+                    } else if (heightSetpoint2 < 1.0 && !climbMode) {
+                        heightSetpoint2 = 1.0
+                    }
+                    if (climbMode || (OI.operatorLeftY.absoluteValue < 0.1 && OI.operatorRightY.absoluteValue < 0.1)) {
                         heightMotor1.setPositionSetpoint(heightSetpoint1)
+                        heightMotor2.setPositionSetpoint(heightSetpoint2)
                     }
                 }
         }
@@ -107,13 +121,23 @@ object Climb : Subsystem("Climb") {
         climbMode = false
     }
 
-    fun setPower(power: Double) {
+    fun setPower1(power: Double) {
         heightMotor1.setPercentOutput(power)
     }
 
+    fun setPower2(power: Double) {
+        heightMotor2.setPercentOutput(power)
+    }
+
+
     fun zeroClimb() {
-        heightMotor1.setRawOffset(0.0.radians)
-        heightSetpoint1 = 0.0
+        if (OI.operatorLeftY.absoluteValue > 0.1) {
+            heightMotor1.setRawOffset(0.0.radians)
+            heightSetpoint1 = 0.0
+        } else if (OI.operatorRightY.absoluteValue > 0.1) {
+            heightMotor2.setRawOffset(0.0.radians)
+            heightSetpoint2 = 0.0
+        }
     }
 
     suspend fun changePosition(current: Double, target: Double, time : Double, function: (value : Double) -> (Unit)) {
@@ -133,7 +157,7 @@ object Climb : Subsystem("Climb") {
 
     fun heightChangeTime(height: Double, target: Double) : Double {
         val distance = (height - target)
-        val rate = if (distance < 0.0) 40.0 else 20.0  // inches per sec
+        val rate = 50.0 // if (distance < 0.0) 40.0 else 20.0  // inches per sec
         return distance.absoluteValue / rate
     }
 

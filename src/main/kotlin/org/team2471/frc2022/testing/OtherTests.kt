@@ -1,11 +1,11 @@
 package org.team2471.frc2022.testing
 
 import org.team2471.frc.lib.coroutines.periodic
-import org.team2471.frc.lib.coroutines.suspendUntil
 import org.team2471.frc.lib.framework.use
 import org.team2471.frc.lib.input.Controller
 import org.team2471.frc.lib.math.round
 import org.team2471.frc2022.*
+import kotlin.math.absoluteValue
 
 suspend fun Feeder.motorTest() = use(this) {
     periodic {
@@ -21,11 +21,14 @@ suspend fun Shooter.pitchTest() = use(this) {
 }
 
 suspend fun Climb.motorTest() = use(this) {
-    var power = OI.driveLeftTrigger - OI.driveRightTrigger
+    var power1 = OI.operatorLeftY * 0.2
+    var power2 = OI.operatorRightY * 0.2
     periodic {
-        power = OI.driveLeftTrigger - OI.driveRightTrigger
-        println("angle power: $power")
-        setPower((OI.operatorRightTrigger - OI.operatorLeftTrigger) * 0.5)
+        power1 = -OI.operatorLeftY
+        power2 = -OI.operatorRightY
+        println("power1: $power1       power2: $power2")
+        setPower1(power1)
+        setPower2(power2)
     }
 }
 
@@ -41,6 +44,8 @@ suspend fun Intake.pivotTest() = use(this) {
 suspend fun Climb.adjustmentTest() = use(this) {
     periodic {
         heightSetpoint1 -= OI.operatorController.leftThumbstickY * (12.0 / 50.0)
+        heightMotor1.setPositionSetpoint(heightSetpoint1)
+
     }
 }
 

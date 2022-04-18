@@ -1,5 +1,6 @@
 package org.team2471.frc2022
 
+import edu.wpi.first.wpilibj2.command.CommandGroupBase.parallel
 import org.team2471.frc.lib.coroutines.delay
 import org.team2471.frc.lib.coroutines.parallel
 import org.team2471.frc.lib.coroutines.periodic
@@ -227,13 +228,12 @@ suspend fun climbPrep() = use(Climb) {
     println("trying to climbprep")
 
     Feeder.autoFeedMode = false
-    if (Climb.climbIsPrepped){
-        Climb.climbIsPrepped = false
-        println("FUN")
-        delay(0.5)
-    } else {
+//    if (Climb.climbIsPrepped){
+//        Climb.climbIsPrepped = false
+//        println("FUN")
+//        delay(0.5)
+//    } else {
         Climb.climbMode = true
-
         climbPrepOther()
         goToPose(Pose.CLIMB_PREP)
         Climb.climbIsPrepped = true
@@ -242,7 +242,7 @@ suspend fun climbPrep() = use(Climb) {
         if (Climb.climbIsPrepped) {
             performClimb()
         }
-    }
+//    }
 }
 
 suspend fun climbPrepOther () = use(Shooter, Intake) {
@@ -261,25 +261,28 @@ suspend fun performClimb() {
         //println("Climb stage executing: ${Climb.climbStage} roll: ${Climb.roll}")
         OI.operatorController.rumble = 0.5
         var lasTroll = Climb.roll
-        while (Climb.climbIsPrepped) {
-            Climb.climbStage = 0
-            while (Climb.climbStage < 2 && Climb.climbIsPrepped) {
-                if (OI.operatorController.rightBumper) {  //rightBumper instead of leftTrigger
-                    println("Trigger climb stage ${Climb.climbStage}, roll is ${Climb.roll}")
-                    when (Climb.climbStage) {
-                        1 -> {
-                            goToPose(Pose.CLIMB_HIGH_BAR)
-                        }
-
-                        2 -> {
-                            goToPose(Pose.CLIMB_TRAVERSE)
-                        }
-
-                        else -> println("Climb Stage Complete")
+        Climb.climbStage = 0
+        while (Climb.climbStage < 3 && Climb.climbIsPrepped) {
+            if (OI.operatorController.rightBumper) {  //rightBumper instead of leftTrigger
+                println("Trigger climb stage ${Climb.climbStage}, roll is ${Climb.roll}")
+                when (Climb.climbStage) {
+                    0 -> {
+                        goToPose(Pose.CLIMB_LEFT_DOWN)
+                        delay(2.3)
                     }
+                    1 -> {
+                        goToPose(Pose.CLIMB_RIGHT_DOWN)
+                        delay(1.8) //1.2
+                    }
+                    2 -> {
+                        goToPose(Pose.CLIMB_LEFT_DOWN)
+                    }
+                    else -> println("Climb Stage Complete")
                 }
-                Climb.climbStage += 1
+            } else {
+                println("rightBumper let go")
             }
+            Climb.climbStage += 1
         }
     }
     OI.operatorController.rumble = 0.0
