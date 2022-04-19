@@ -272,7 +272,7 @@ suspend fun performClimb() {
                     }
                     1 -> {
                         goToPose(Pose.CLIMB_RIGHT_DOWN)
-                        delay(1.8) //1.2
+                        delay(3.0) //1.8
                     }
                     2 -> {
                         goToPose(Pose.CLIMB_LEFT_DOWN)
