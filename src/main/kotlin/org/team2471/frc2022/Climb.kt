@@ -23,8 +23,8 @@ import javax.swing.Action
 import kotlin.math.absoluteValue
 
 object Climb : Subsystem("Climb") {
-    val heightMotor = MotorController(FalconID(Falcons.CLIMB), FalconID(Falcons.CLIMB_TWO))
-    val angleMotor = MotorController(FalconID(Falcons.CLIMB_ANGLE))
+//    val heightMotor = MotorController(FalconID(Falcons.CLIMB), FalconID(Falcons.CLIMB_TWO))
+//    val angleMotor = MotorController(FalconID(Falcons.CLIMB_ANGLE))
     val angleEncoder = DutyCycleEncoder(if (isCompBot) {DigitalSensors.CLIMB_ANGLE} else {7})
     private val table = NetworkTableInstance.getDefault().getTable(name)
 
@@ -43,7 +43,7 @@ object Climb : Subsystem("Climb") {
     var climbMode = false
     var bungeeTakeOver = false
     val height: Double
-        get() = heightMotor.position
+        get() = 0.0
     var heightSetpoint = height
         get() = heightSetpointEntry.getDouble(height)
         set(value) {
@@ -102,29 +102,6 @@ object Climb : Subsystem("Climb") {
     var isAngleMotorControlled = false
 
     init {
-        heightMotor.config {
-            brakeMode()
-            inverted(true)
-            followersInverted(true)
-            feedbackCoefficient = 3.14 / 2048.0 / 9.38 * 28.5 / 25.5 // * 30.0 / 25.5 //3.14 / 2048.0 / 9.38 * 30.0 / 26.0
-            pid {
-                p(0.00000002)
-            }
-        }
-        angleMotor.config {
-            coastMode()  //0.09
-            inverted(true)
-            feedbackCoefficient = (360.0 / 2048.0 / 87.1875 * 90.0 / 83.0 / 3.0) // * (if (isCompBot) 34.0 / 40.0 else 39.0 / 26.0))
-            pid {
-                p(0.00000001) //0.04)
-                d(0.00000001)
-//                p(0.000000012) //0.000000008) //2e-8) //1e-5)
-//                d(1e-7)
-            }
-            setRawOffsetConfig(angle.degrees) //(-4.5).degrees)
-            currentLimit(45, 50, 1)      //not tested yet but these values after looking at current graph 3/30
-        }
-        heightMotor.position = 1.0
         heightSetpointEntry.setDouble(height)
         angleSetpointEntry.setDouble(angle)
         setStatusFrames(true)
@@ -141,14 +118,14 @@ object Climb : Subsystem("Climb") {
 //            }, {
                 periodic {
                     //println("absolute: ${round(angleAbsoluteRaw, 4)} relative:$angleRelativeRaw abs: $angleAbsolute rel: $angle diff = ${angleAbsolute - angle}")
-                    heightEntry.setDouble(heightMotor.position)
+//                    heightEntry.setDouble(heightMotor.position)
                     angleEntry.setDouble(angle)
-                    angleMotorEntry.setDouble(angleMotor.position)
+//                    angleMotorEntry.setDouble(angleMotor.position)
                     val throughBoreAngle = (((((angleEncoder.absolutePosition * angleEncoderModifier) - 0.0429) * 360.0) -2.0) * 29.1 / 42.2).degrees.wrap().asDegrees
                     throughBoreEntry.setDouble(throughBoreAngle)
                     robotRollEntry.setDouble(roll)
-                    heightMotorOutput.setDouble(heightMotor.output)
-                    angleMotorOutput.setDouble(angleMotor.output)
+//                    heightMotorOutput.setDouble(heightMotor.output)
+//                    angleMotorOutput.setDouble(angleMotor.output)
 
                     angleFeedForwardCurve.setMarkBeginOrEndKeysToZeroSlope(false)
 
@@ -159,7 +136,7 @@ object Climb : Subsystem("Climb") {
 
 //                    println("angle: $angle      f: $angleFeedForward")
 
-                    angleMotor.setRawOffset(angle.degrees)
+//                    angleMotor.setRawOffset(angle.degrees)
                     if ((climbMode && !bungeeTakeOver) || OI.operatorRightX.absoluteValue > 0.1) {
                             if (OI.operatorRightX.absoluteValue > 0.1) {
                                 angleSetpoint += OI.operatorRightX * 0.1
@@ -183,7 +160,7 @@ object Climb : Subsystem("Climb") {
                         } else if (heightSetpoint < 1.0 && !climbMode) {
                             heightSetpoint = 1.0
                         }
-                        heightMotor.setPositionSetpoint(heightSetpoint)
+//                        heightMotor.setPositionSetpoint(heightSetpoint)
                     }
 //                    println("angleOutput: ${angleMotor.output}")
                 }
@@ -192,12 +169,12 @@ object Climb : Subsystem("Climb") {
     fun setStatusFrames(forClimb : Boolean = false) {
         val framePeriod_1 = if (forClimb) 10 else 100
         val framePeriod_2 = 2*framePeriod_1
-        println("height statusframe1 from ${heightMotor.getStatusFramePeriod(StatusFrame.Status_1_General)} to $framePeriod_1")
-        println("height statusframe2 from ${heightMotor.getStatusFramePeriod(StatusFrame.Status_2_Feedback0)} to $framePeriod_2")
-        heightMotor.setStatusFramePeriod(StatusFrame.Status_1_General, framePeriod_1)
-        heightMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, framePeriod_2)
-        angleMotor.setStatusFramePeriod(StatusFrame.Status_1_General, framePeriod_1)
-        angleMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, framePeriod_2)
+//        println("height statusframe1 from ${heightMotor.getStatusFramePeriod(StatusFrame.Status_1_General)} to $framePeriod_1")
+//        println("height statusframe2 from ${heightMotor.getStatusFramePeriod(StatusFrame.Status_2_Feedback0)} to $framePeriod_2")
+//        heightMotor.setStatusFramePeriod(StatusFrame.Status_1_General, framePeriod_1)
+//        heightMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, framePeriod_2)
+//        angleMotor.setStatusFramePeriod(StatusFrame.Status_1_General, framePeriod_1)
+//        angleMotor.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, framePeriod_2)
     }
 
     override fun postEnable() {
@@ -206,19 +183,19 @@ object Climb : Subsystem("Climb") {
     }
 
     fun setPower(power: Double) {
-        heightMotor.setPercentOutput(power)
+//        heightMotor.setPercentOutput(power)
     }
 
     fun angleSetPower(power: Double) {
-        if (!bungeeTakeOver) {
-            angleMotor.setPercentOutput(power)
-        } else {
-            angleMotor.setPercentOutput(0.0)
-        }
+//        if (!bungeeTakeOver) {
+//            angleMotor.setPercentOutput(power)
+//        } else {
+//            angleMotor.setPercentOutput(0.0)
+//        }
     }
 
     fun zeroClimb() {
-        heightMotor.setRawOffset(0.0.radians)
+//        heightMotor.setRawOffset(0.0.radians)
         heightSetpoint = 0.0
     }
     fun angleChangeTime(target: Double) : Double {
@@ -273,10 +250,10 @@ object Climb : Subsystem("Climb") {
     }
 
     fun updatePositions() {
-        heightMotor.setPositionSetpoint(heightSetpoint)
+//        heightMotor.setPositionSetpoint(heightSetpoint)
         if (!bungeeTakeOver) {
             if (isAngleMotorControlled) {
-                angleMotor.setPositionSetpoint(angleSetpoint, angleFeedForward)
+//                angleMotor.setPositionSetpoint(angleSetpoint, angleFeedForward)
 //            println("motor setting angle power to ${angleMotor.output}")
             } else {
                 val power = anglePDController.update(angleSetpoint - angle)

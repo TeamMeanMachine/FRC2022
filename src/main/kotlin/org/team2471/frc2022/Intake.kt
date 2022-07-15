@@ -25,7 +25,7 @@ import edu.wpi.first.wpilibj.Timer as Timer
 object Intake : Subsystem("Intake") {
 
     val intakeMotor = MotorController(TalonID(Talons.INTAKE))
-    val intakePivotMotor = MotorController(FalconID(Falcons.INTAKE_PIVOT))
+//    val intakePivotMotor = MotorController(FalconID(Falcons.INTAKE_PIVOT))
 
     private val table = NetworkTableInstance.getDefault().getTable(Intake.name)
     val currentEntry = table.getEntry("Current")
@@ -90,19 +90,7 @@ object Intake : Subsystem("Intake") {
     init {
         pivotDriverOffsetEntry.getDouble(0.0)
         intakePresetEntry.getDouble(defaultPivotIntake)
-        intakePivotMotor.config(20) {
-            feedbackCoefficient =
-                360.0 / 2048.0 / 135.0 * 118.4 / 105.1  // * 111.0 / 103.0 // degrees in a rotation, ticks per rotation
-            brakeMode()
-//            inverted(true)
-            pid {
-                p(1e-5)
-                d(0.00000005)
-//                f(0.04)
-            }
 
-            currentLimit(20, 30, 1)//40, 60, 1)
-        }
         intakeMotor.config {
             coastMode()
             currentLimit(20, 40, 1)
@@ -133,7 +121,7 @@ object Intake : Subsystem("Intake") {
             periodic {
                 currentEntry.setDouble(intakeMotor.current)
                 pivotEntry.setDouble(pivotAngle) // intakePivotMotor.position)
-                pivotMotorEntry.setDouble(intakePivotMotor.position)
+//                pivotMotorEntry.setDouble(intakePivotMotor.position)
 //                println("pivotMotor ${intakePivotMotor.position}")
                 intakeStateEntry.setString(intakeState.name)
 
@@ -223,7 +211,7 @@ object Intake : Subsystem("Intake") {
                 if (pivotPDEnable) {
 //                    val power = pivotPDController.update(pivotSetpoint - pivotAngle)
 //                    setIntakePivotPower(power)
-                    intakePivotMotor.setPositionSetpoint(pivotSetpoint)
+//                    intakePivotMotor.setPositionSetpoint(pivotSetpoint)
                 }
             }
         }
@@ -234,7 +222,7 @@ object Intake : Subsystem("Intake") {
 
     fun resetPivotOffset(){
         println("resetting intake pivot rawOffset ${pivotAngle.degrees}")
-        intakePivotMotor.setRawOffset(pivotAngle.degrees)
+//        intakePivotMotor.setRawOffset(pivotAngle.degrees)
         pivotDriverOffset = 0.0
         pivotSetpoint = pivotAngle
     }
@@ -244,7 +232,7 @@ object Intake : Subsystem("Intake") {
     }
 
     fun setIntakePivotPower(power: Double) {
-        intakePivotMotor.setPercentOutput(power)
+//        intakePivotMotor.setPercentOutput(power)
     }
 
     fun changeAngle(angle: Double) {
@@ -297,7 +285,7 @@ object Intake : Subsystem("Intake") {
 
     override suspend fun default() {
         periodic {
-            pivotMotorEntry.setDouble(intakePivotMotor.position)
+//            pivotMotorEntry.setDouble(intakePivotMotor.position)
             //currentEntry.setDouble(Shooter.shootingMotor.current)
         }
     //    print(":)")
@@ -331,7 +319,7 @@ suspend fun Intake.powerTest() = use(this) {
             power -= 0.001
             println("down power= ${power}")
         }
-        intakePivotMotor.setPositionSetpoint(0.0, power)
+//        intakePivotMotor.setPositionSetpoint(0.0, power)
         println("power= ${power}")
     }
 }

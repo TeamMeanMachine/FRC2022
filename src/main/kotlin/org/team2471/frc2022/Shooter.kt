@@ -46,7 +46,7 @@ object Shooter : Subsystem("Shooter") {
             return knownShotType.valueOf(SmartDashboard.getString("KnownShot/selected", "notset").uppercase())
         }
 
-    const val aimMaxError = 3.0
+    const val aimMaxError = 2.5
     const val rpmMaxError = 200.0
     const val pitchMaxError = 2.5
 

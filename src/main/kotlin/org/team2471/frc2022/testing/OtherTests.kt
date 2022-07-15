@@ -42,7 +42,7 @@ suspend fun Climb.anglePIDTest() = use(this){
         setpoint = (OI.operatorController.leftThumbstickY * 10.0 ) + 15.0
         angleSetpoint = setpoint
         updatePositions()
-        println("climb setpoint: $setpoint                      climb angle output ${angleMotor.output}")
+//        println("climb setpoint: $setpoint                      climb angle output ${angleMotor.output}")
 
     }
 }
@@ -50,7 +50,7 @@ suspend fun Climb.anglePIDTest() = use(this){
 suspend fun Intake.pivotTest() = use(this) {
     periodic {
         var power = (OI.driveRightTrigger - OI.driveLeftTrigger)
-        intakePivotMotor.setPercentOutput(power)
+//        intakePivotMotor.setPercentOutput(power)
         if (power > 0.1) println("pivotTest active    $power")
     }
 }
@@ -137,9 +137,9 @@ suspend fun Climb.currentTest() = use(this) {
 //        }
 //        println()
 //        println("power: $power")
-        angleMotor.setPositionSetpoint(25.0, f)
+//        angleMotor.setPositionSetpoint(25.0, f)
 //        angleSetPower(f)
-        println("current: ${round(angleMotor.current, 2)}  f: $f")
+//        println("current: ${round(angleMotor.current, 2)}  f: $f")
 //        drive(
 //            Vector2(0.0, power),
 //            0.0,
@@ -171,8 +171,8 @@ suspend fun Intake.pivotFeedForwardTest() {
 //        }
 //        println()
 //        println("power: $power")
-        intakePivotMotor.setPositionSetpoint(5.0, f)
-        println("current: ${round(intakePivotMotor.current, 2)}  f: $f")
+//        intakePivotMotor.setPositionSetpoint(5.0, f)
+//        println("current: ${round(intakePivotMotor.current, 2)}  f: $f")
 //        drive(
 //            Vector2(0.0, power),
 //            0.0,
