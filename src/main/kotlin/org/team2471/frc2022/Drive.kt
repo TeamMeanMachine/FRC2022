@@ -53,8 +53,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     val fieldObject = Field2d()
     val radarObject = Field2d()
 
-    val limitingFactor : Double
-        get() = if (Climb.climbIsPrepped) 0.25 else 1.0
+
     val fieldDimensions = Vector2(26.9375.feet.asMeters,54.0.feet.asMeters)
     val fieldCenterOffset = fieldDimensions/2.0
 
@@ -115,7 +114,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     override val headingRate: AngularVelocity
         get() = -gyro.rate.degrees.perSecond
 
-    var autoAim: Boolean = false
+
 
     override var velocity = Vector2(0.0, 0.0)
 
@@ -255,7 +254,6 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                 xEntry.setDouble(x)
                 yEntry.setDouble(y)
                 headingEntry.setDouble(heading.asDegrees)
-                aimErrorEntry.setDouble(Limelight.aimError)
                 angleZeroEntry.setDouble((modules[0] as Module).analogAngle.asDegrees)
                 angleOneEntry.setDouble((modules[1] as Module).analogAngle.asDegrees)
                 angleTwoEntry.setDouble((modules[2] as Module).analogAngle.asDegrees)
@@ -278,7 +276,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                 val lastRobotFieldXY = robotFieldEntry.getDoubleArray(defaultXYPos)
                 val lastX = lastRobotFieldXY[0]
                 val lastY = lastRobotFieldXY[1]
-                if (!Shooter.shootMode &&  lastX != 0.0 && lastY != 0.0 && robotHalfWidth < lastX && lastX < fieldDimensions.x - robotHalfWidth && robotHalfWidth < lastY && lastY < fieldDimensions.y - robotHalfWidth && (lastPosition.x != lastX || lastPosition.y != lastY)) {
+                if (lastX != 0.0 && lastY != 0.0 && robotHalfWidth < lastX && lastX < fieldDimensions.x - robotHalfWidth && robotHalfWidth < lastY && lastY < fieldDimensions.y - robotHalfWidth && (lastPosition.x != lastX || lastPosition.y != lastY)) {
                     position = Vector2((lastX - fieldCenterOffset.x).meters.asFeet, (lastY - fieldCenterOffset.y).meters.asFeet)
                     lastPosition = fieldObject.robotPose
                     println("from fieldobject")
@@ -301,7 +299,6 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                 blueFieldCargoEntry.setDoubleArray(blueCargoOnField.toDoubleArray())
                 robotsFieldEntry.setDoubleArray(robotOnField.toDoubleArray())
 
-                autoAim = Shooter.shootMode && Shooter.isKnownShot == Shooter.knownShotType.NOTSET
                 // println(gyro.getNavX().pitch.degrees)
 
 //                for (moduleCount in 0..3) {
@@ -364,38 +361,20 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             if (OI.driveRotation.absoluteValue > 0.001) {
                 turn = OI.driveRotation
             }
-            else if (Limelight.hasValidTarget && autoAim) {
-                turn = aimPDController.update(Limelight.aimError)
-                println("LimeLightAimError=${Limelight.aimError}")
-            } else if (autoAim) {
-                var error = (position.angle.radians - heading).wrap()
-                if (error.asDegrees.absoluteValue > 90.0) error = (error - 180.0.degrees).wrap()
-                turn = aimPDController.update(error.asDegrees)
-            }
 //            printEncoderValues()
 
             headingSetpoint = OI.driverController.povDirection
 
             drive(
-                OI.driveTranslation * limitingFactor,
-                turn * limitingFactor,
+                OI.driveTranslation,
+                turn,
                 SmartDashboard.getBoolean("Use Gyro", true) && !DriverStation.isAutonomous(),
                 false
             )
         }
     }
 
-    fun autoSteer() {
-        var turn = 0.0
-        if (Limelight.hasValidTarget && (!Feeder.isAuto || !Shooter.useAutoOdomEntry.getBoolean(false))) {
-            turn = aimPDController.update(Limelight.aimError)
-        }
-        Drive.drive(
-            Vector2(0.0,0.0),
-            turn,
-            false
-        )
-    }
+
 
     fun printEncoderValues() {
         for (moduleCount in 0..3) {

@@ -43,24 +43,18 @@ object Robot : MeanlibRobot() {
         Drive.heading = 0.0.degrees
         AutoChooser
 //        ShootingTests
-        Intake
-        Shooter
-        Feeder
-        Limelight
-        Climb
+
         PowerInfo
     }
 
     override suspend fun enable() {
         println("starting enable")
         Drive.enable()
-        Intake.enable()
-        Feeder.enable()
+
         //FrontLimelight.enable()
 //        Drive.initializeSteeringMotors()
 //        ShootingTests.enable()
-        Shooter.enable()
-        Climb.enable()
+
 //        zeroIntakePivot()
         println("ending enable")
         PowerInfo.enable()
@@ -72,18 +66,17 @@ object Robot : MeanlibRobot() {
 //        Drive.zeroGyro()
         Drive.brakeMode()
         Drive.aimPDController = Drive.autoPDController
-        Feeder.autoFeedMode = true
         println("autonomous Drive brakeMode ${totalTimeTaken()}")
         AutoChooser.autonomous()
         println("autonomous ending ${totalTimeTaken()}")
-        Feeder.autoFeedMode = false
+
     }
 
     override suspend fun teleop() {
         println("telop begin")
         Drive.aimPDController = Drive.teleopPDController
         Drive.headingSetpoint = Drive.heading
-        Feeder.autoFeedMode = false
+
     }
 
     override suspend fun test()  {
@@ -94,10 +87,6 @@ object Robot : MeanlibRobot() {
 
     override suspend fun disable() {
         Drive.disable()
-        Intake.disable()
-        Shooter.disable()
-        Feeder.disable()
-        Climb.disable()
         PowerInfo.disable()
         OI.operatorController.rumble = 0.0
 //        PowerDistribution.disable()
