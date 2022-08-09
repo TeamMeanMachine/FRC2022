@@ -361,7 +361,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             if (OI.driveRotation.absoluteValue > 0.001) {
                 turn = OI.driveRotation
             }
-//            printEncoderValues()
+            printEncoderValues()
 
             headingSetpoint = OI.driverController.povDirection
 
@@ -377,9 +377,17 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 
 
     fun printEncoderValues() {
-        for (moduleCount in 0..3) {
-            print("$moduleCount=${round((modules[moduleCount] as Module).analogAngle.asDegrees, 2)}   ")
+        var totalCurrent=0.0
+        var totalSpeed=0.0
+        for (module in 0..3) {
+            totalCurrent += (modules[module] as Module).driveCurrent
+            totalSpeed += (modules[module] as Module).speed.absoluteValue
         }
+        totalCurrent /= 4.0
+        totalSpeed /= 4.0
+        val accel = Vector2(navX.getNavX().worldLinearAccelX.toDouble(), navX.getNavX().worldLinearAccelY.toDouble())
+        println("Accel=${round((accel.length)*32.1,2)}  Current= ${round(totalCurrent,2)}   Speed= ${round(totalSpeed,2)}   ")
+
     }
 
     fun initializeSteeringMotors() {
