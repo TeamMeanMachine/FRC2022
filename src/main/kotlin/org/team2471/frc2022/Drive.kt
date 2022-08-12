@@ -50,12 +50,19 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     val angleSpeedEntry = table.getEntry("angleSpeed")
     val radialSpeedEntry = table.getEntry("radialSpeed")
 
+    val navxAccelEntry = table.getEntry("Navx Acceleration")
+    val wheelAccelEntry = table.getEntry("Wheel Acceleration")
+    val averageCurrentEntry = table.getEntry("Average Current")
+    val averageWheelSpeedEntry = table.getEntry("Average Wheel Speed")
+
     val fieldObject = Field2d()
     val radarObject = Field2d()
 
 
     val fieldDimensions = Vector2(26.9375.feet.asMeters,54.0.feet.asMeters)
     val fieldCenterOffset = fieldDimensions/2.0
+
+    var previousAverageSpeed = 0.0
 
     /**
      * Coordinates of modules
@@ -385,9 +392,16 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         }
         totalCurrent /= 4.0
         totalSpeed /= 4.0
+        var odometryAcceleration = (totalSpeed - previousAverageSpeed).absoluteValue*50.0
         val accel = Vector2(navX.getNavX().worldLinearAccelX.toDouble(), navX.getNavX().worldLinearAccelY.toDouble())
-        println("Accel=${round((accel.length)*32.1,2)}  Current= ${round(totalCurrent,2)}   Speed= ${round(totalSpeed,2)}   ")
+        println("Accel=${round((accel.length)*32.1,2)},${round(odometryAcceleration,2)}  Current= ${round(totalCurrent,2)}   Speed= ${round(totalSpeed,2)}   ")
 
+        navxAccelEntry.setDouble((accel.length)*32.1)
+        wheelAccelEntry.setDouble(odometryAcceleration)
+        averageCurrentEntry.setDouble(totalCurrent)
+        averageWheelSpeedEntry.setDouble(totalSpeed)
+
+        previousAverageSpeed = totalSpeed
     }
 
     fun initializeSteeringMotors() {
