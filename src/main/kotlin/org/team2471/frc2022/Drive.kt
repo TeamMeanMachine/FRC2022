@@ -394,8 +394,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         totalSpeed /= 4.0
         var odometryAcceleration = (totalSpeed - previousAverageSpeed).absoluteValue*50.0
         val accel = Vector2(navX.getNavX().worldLinearAccelX.toDouble(), navX.getNavX().worldLinearAccelY.toDouble())
-        println("Accel=${round((accel.length)*32.1,2)},${round(odometryAcceleration,2)}  Current= ${round(totalCurrent,2)}   Speed= ${round(totalSpeed,2)}   ")
-
+        println("Accel=${round((accel.length)*32.1,2)},${round(odometryAcceleration,2)}  Current= ${round(totalCurrent,2)}   Speed= ${round(totalSpeed,2) } Current to Speed= ${round(totalCurrent/totalSpeed,2)}  ")
         navxAccelEntry.setDouble((accel.length)*32.1)
         wheelAccelEntry.setDouble(odometryAcceleration)
         averageCurrentEntry.setDouble(totalCurrent)
