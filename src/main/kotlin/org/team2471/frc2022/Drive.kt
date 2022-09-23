@@ -1,5 +1,6 @@
 package org.team2471.frc2022
 
+import com.ctre.phoenix.sensors.CANCoder
 import edu.wpi.first.math.filter.LinearFilter
 import edu.wpi.first.math.geometry.Pose2d
 import edu.wpi.first.math.geometry.Rotation2d
@@ -19,7 +20,6 @@ import org.team2471.frc.lib.coroutines.*
 import org.team2471.frc.lib.framework.Subsystem
 import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.math.linearMap
-import org.team2471.frc.lib.math.round
 import org.team2471.frc.lib.motion.following.*
 import org.team2471.frc.lib.motion_profiling.MotionCurve
 import org.team2471.frc.lib.motion_profiling.following.SwerveParameters
@@ -44,6 +44,11 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     val odometer1Entry = table.getEntry("Odometer 1")
     val odometer2Entry = table.getEntry("Odometer 2")
     val odometer3Entry = table.getEntry("Odometer 3")
+    val offset0Entry = table.getEntry("Offset 0")
+    val offset1Entry = table.getEntry("Offset 1")
+    val offset2Entry = table.getEntry("Offset 2")
+    val offset3Entry = table.getEntry("Offset 3")
+
 
     val radialVelocityEntry = table.getEntry("Radial Velocity")
     val angularVelocityEntry = table.getEntry("Angular Velocity")
@@ -69,18 +74,21 @@ object Drive : Subsystem("Drive"), SwerveDrive {
      * **/
     override val modules: Array<SwerveDrive.Module> = arrayOf(
         Module(
-            MotorController(FalconID(Falcons.DRIVE_FRONTLEFT)),
-            MotorController(FalconID(Falcons.STEER_FRONTLEFT)),
+            MotorController(FalconID(Falcons.DRIVE_FRONTLEFT, "TestCanivore")),
+            MotorController(FalconID(Falcons.STEER_FRONTLEFT, "TestCanivore")),
             Vector2(-11.5, 14.0),
-            (45.0).degrees,
-            AnalogSensors.SWERVE_FRONT_LEFT,
-            odometer0Entry
+            offset0Entry.getDouble(0.0).degrees,
+            CANCoders.CANCODER_FRONTLEFT,
+            odometer0Entry,
+            offset0Entry
         ),
+/*
+
         Module(
             MotorController(FalconID(Falcons.DRIVE_FRONTRIGHT)),
             MotorController(FalconID(Falcons.STEER_FRONTRIGHT)),
             Vector2(11.5, 14.0),
-            (135.0).degrees,
+            offset1Entry.getDouble(0.0).degrees,
             AnalogSensors.SWERVE_FRONT_RIGHT,
             odometer1Entry
         ),
@@ -88,7 +96,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             MotorController(FalconID(Falcons.DRIVE_BACKRIGHT)),
             MotorController(FalconID(Falcons.STEER_BACKRIGHT)),
             Vector2(11.5, -14.0),
-            (-135.0).degrees,
+            offset2Entry.getDouble(0.0).degrees,
             AnalogSensors.SWERVE_BACK_RIGHT,
             odometer2Entry
         ),
@@ -96,10 +104,11 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             MotorController(FalconID(Falcons.DRIVE_BACKLEFT)),
             MotorController(FalconID(Falcons.STEER_BACKLEFT)),
             Vector2(-11.5, -14.0),
-            (-45.0).degrees,
+            offset3Entry.getDouble(0.0).degrees,
             AnalogSensors.SWERVE_BACK_LEFT,
             odometer3Entry
         )
+*/
     )
 
     //    val gyro: Gyro? = null
@@ -207,7 +216,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 //            odometer3Entry.setPersistent()
             println("in drive global scope")
 //
-            SmartDashboard.setDefaultNumber("DemoSpeed", 0.4)
+            SmartDashboard.setDefaultNumber("DemoSpeed", 1.0)
 //            SmartDashboard.clearPersistent("Demo Speed")
 
 
@@ -250,6 +259,8 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 
 //            aimPEntry.setDouble(0.015)
 //            aimDEntry.setDouble(0.005)
+
+            println("in init just before periodic")
             periodic {
                 var (x, y) = position
                 if (x.absoluteValue > reducedField.x || y.absoluteValue > reducedField.y ){
@@ -261,10 +272,10 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                 xEntry.setDouble(x)
                 yEntry.setDouble(y)
                 headingEntry.setDouble(heading.asDegrees)
-                angleZeroEntry.setDouble((modules[0] as Module).analogAngle.asDegrees)
-                angleOneEntry.setDouble((modules[1] as Module).analogAngle.asDegrees)
-                angleTwoEntry.setDouble((modules[2] as Module).analogAngle.asDegrees)
-                angleThreeEntry.setDouble((modules[3] as Module).analogAngle.asDegrees)
+//                angleZeroEntry.setDouble((modules[0] as Module).analogAngle.asDegrees)
+//                angleOneEntry.setDouble((modules[1] as Module).analogAngle.asDegrees)
+//                angleTwoEntry.setDouble((modules[2] as Module).analogAngle.asDegrees)
+//                angleThreeEntry.setDouble((modules[3] as Module).analogAngle.asDegrees)
 //               println("XPos: ${position.x.feet} yPos: ${position.y.feet}")
 //                val currRobotPose = fieldObject.robotPose
 
@@ -308,7 +319,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 
                 // println(gyro.getNavX().pitch.degrees)
 
-//                for (moduleCount in 0..3) {
+//                for (moduleCount in 0..modules.size-1) {
 //                    val module = (modules[moduleCount] as Module)
 //                    print("Module: $moduleCount analogAngle: ${round(module.analogAngle.asDegrees, 2)}  ")
 //                }
@@ -384,35 +395,35 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 
 
     fun printEncoderValues() {
-        var totalCurrent=0.0
-        var totalSpeed=0.0
-        for (module in 0..3) {
-            totalCurrent += (modules[module] as Module).driveCurrent
-            totalSpeed += (modules[module] as Module).speed.absoluteValue
-        }
-        totalCurrent /= 4.0
-        totalSpeed /= 4.0
-        var odometryAcceleration = (totalSpeed - previousAverageSpeed).absoluteValue*50.0
-        val accel = Vector2(navX.getNavX().worldLinearAccelX.toDouble(), navX.getNavX().worldLinearAccelY.toDouble())
-  //      println("Accel=${round((accel.length)*32.1,2)},${round(odometryAcceleration,2)}  Current= ${round(totalCurrent,2)}   Speed= ${round(totalSpeed,2) } Current to Speed= ${round(totalCurrent/totalSpeed,2)}  ")
-        navxAccelEntry.setDouble((accel.length)*32.1)
-        wheelAccelEntry.setDouble(odometryAcceleration)
-        averageCurrentEntry.setDouble(totalCurrent)
-        averageWheelSpeedEntry.setDouble(totalSpeed)
-
-        previousAverageSpeed = totalSpeed
+//        var totalCurrent=0.0
+//        var totalSpeed=0.0
+//        for (module in 0..modules.size-1) {
+//            totalCurrent += (modules[module] as Module).driveCurrent
+//            totalSpeed += (modules[module] as Module).speed.absoluteValue
+//        }
+//        totalCurrent /= 4.0
+//        totalSpeed /= 4.0
+//        var odometryAcceleration = (totalSpeed - previousAverageSpeed).absoluteValue*50.0
+//        val accel = Vector2(navX.getNavX().worldLinearAccelX.toDouble(), navX.getNavX().worldLinearAccelY.toDouble())
+//  //      println("Accel=${round((accel.length)*32.1,2)},${round(odometryAcceleration,2)}  Current= ${round(totalCurrent,2)}   Speed= ${round(totalSpeed,2) } Current to Speed= ${round(totalCurrent/totalSpeed,2)}  ")
+//        navxAccelEntry.setDouble((accel.length)*32.1)
+//        wheelAccelEntry.setDouble(odometryAcceleration)
+//        averageCurrentEntry.setDouble(totalCurrent)
+//        averageWheelSpeedEntry.setDouble(totalSpeed)
+//
+//        previousAverageSpeed = totalSpeed
     }
 
     fun initializeSteeringMotors() {
-        for (moduleCount in 0..3) {
+        for (moduleCount in 0..modules.size-1) {
             val module = (modules[moduleCount] as Module)
-            module.turnMotor.setRawOffset(module.analogAngle)
-            println("Module: $moduleCount analogAngle: ${module.analogAngle}")
+            module.turnMotor.setRawOffset(module.absoluteAngle)
+            println("Module: $moduleCount analogAngle: ${module.absoluteAngle}")
         }
     }
 
     fun resetDriveMotors() {
-        for (moduleCount in 0..3) {
+        for (moduleCount in 0..modules.size-1) {
             val module = (modules[moduleCount] as Module)
             module.driveMotor.restoreFactoryDefaults()
             println("For module $moduleCount, drive motor's factory defaults were restored.")
@@ -420,7 +431,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     }
 
     fun resetSteeringMotors() {
-        for (moduleCount in 0..3) {
+        for (moduleCount in 0..modules.size-1) {
             val module = (modules[moduleCount] as Module)
             module.turnMotor.restoreFactoryDefaults()
             println("For module $moduleCount, turn motor's factory defaults were restored.")
@@ -428,14 +439,14 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     }
 
     fun brakeMode() {
-//        for (moduleCount in 0..3) {
-//            val module = (modules[moduleCount] as Module)
-//            module.driveMotor.brakeMode()
-//        }
+        for (moduleCount in 0..modules.size-1) {
+            val module = (modules[moduleCount] as Module)
+            module.driveMotor.brakeMode()
+        }
     }
 
     fun coastMode() {
-        for (moduleCount in 0..3) {
+        for (moduleCount in 0..modules.size-1) {
             val module = (modules[moduleCount] as Module)
             module.driveMotor.coastMode()
         }
@@ -446,8 +457,9 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         val turnMotor: MotorController,
         override val modulePosition: Vector2,
         override val angleOffset: Angle,
-        private val analogAnglePort: Int,
-        private val odometerEntry: NetworkTableEntry
+        canCoderID: Int,
+        private val odometerEntry: NetworkTableEntry,
+        private val offsetEntry: NetworkTableEntry
     ) : SwerveDrive.Module {
         companion object {
             private const val ANGLE_MAX = 983
@@ -460,11 +472,13 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         override val angle: Angle
             get() = turnMotor.position.degrees
 
-        private val analogAngleInput : AnalogInput = AnalogInput(analogAnglePort)
+//        private val analogAngleInput : AnalogInput = AnalogInput(analogAnglePort)
+        val canCoder : CANCoder = CANCoder(canCoderID, "TestCanivore")
 
-        val analogAngle: Angle
+        val absoluteAngle: Angle
             get() {
-                return ((((analogAngleInput.voltage - 0.0) / 5.0) * 360.0).degrees + angleOffset).wrap()
+                return canCoder.absolutePosition.degrees
+//                return ((((analogAngleInput.voltage - 0.0) / 5.0) * 360.0).degrees + angleOffset).wrap()
             }
 
         override val treadWear: Double
@@ -507,10 +521,12 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             get() = turnMotor.closedLoopError.degrees
 
         init {
+            println("Drive.module.init")
             turnMotor.config(20) {
                 // this was from lil bois bench test of swerve
                 feedbackCoefficient = 360.0 / 2048.0 / 21.65  // ~111 ticks per degree // spark max-neo 360.0 / 42.0 / 19.6 // degrees per tick
-                setRawOffsetConfig(analogAngle)
+                println("Angle Offset = $angleOffset")
+                setRawOffsetConfig(absoluteAngle)
                 inverted(true)
                 setSensorPhase(false)
                 pid {
@@ -522,17 +538,19 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 
             val moduleContLimit: Int = when ((driveMotor.motorID as FalconID).value) {
                 Falcons.DRIVE_FRONTLEFT -> 60     //added 5 to all
+/*
                 Falcons.DRIVE_FRONTRIGHT -> 60   //
                 Falcons.DRIVE_BACKRIGHT -> 70     //
                 Falcons.DRIVE_BACKLEFT -> 70
+*/
                 else -> 55
             }
 
             val modulePeakLimit: Int = when ((driveMotor.motorID as FalconID).value) {
                 Falcons.DRIVE_FRONTLEFT -> 65    //added 5 to all
-                Falcons.DRIVE_FRONTRIGHT -> 65    //
-                Falcons.DRIVE_BACKRIGHT -> 75        //
-                Falcons.DRIVE_BACKLEFT -> 75
+//                Falcons.DRIVE_FRONTRIGHT -> 65    //
+//                Falcons.DRIVE_BACKRIGHT -> 75        //
+//                Falcons.DRIVE_BACKLEFT -> 75
                 else -> 60
             }
 
@@ -554,9 +572,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
                     setPersistent()
                     setDefaultDouble(0.00075)
                 }
-
             }
-
         }
 
         override fun driveWithDistance(angle: Angle, distance: Length) {
@@ -569,5 +585,18 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             driveMotor.stop()
             //turnMotor.stop()
         }
+
+        fun setAngleOffset() {
+            offsetEntry.setDouble(absoluteAngle.asDegrees)
+            println("Offset = ${absoluteAngle.asDegrees}")
+        }
+    }
+
+    fun setAngleOffsets() {
+        for (element in modules) {
+            val module = (element as Module)
+            module.setAngleOffset()
+        }
     }
 }
+

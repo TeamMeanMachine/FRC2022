@@ -3,10 +3,18 @@
 package org.team2471.frc2022
 
 import FRC____.BuildConfig
+import edu.wpi.first.math.geometry.Pose2d
+import edu.wpi.first.math.geometry.Rotation2d
 import edu.wpi.first.wpilibj.RobotBase
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import org.team2471.frc.lib.coroutines.MeanlibDispatcher
+import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.MeanlibRobot
-import org.team2471.frc.lib.units.degrees
+import org.team2471.frc.lib.math.Vector2
+import org.team2471.frc.lib.units.*
 import org.team2471.frc2022.testing.*
 import java.net.NetworkInterface
 
@@ -39,8 +47,8 @@ object Robot : MeanlibRobot() {
         }
         println("TAKE ME HOOOOOME COUNTRY ROOOOOOOOADS TOOO THE PLAAAAAAACE WHERE I BELOOOOOOOOONG")
         println(BuildConfig.BUILD_TIME)
-        Drive.zeroGyro()
-        Drive.heading = 0.0.degrees
+//        Drive.zeroGyro()
+//        Drive.heading = 0.0.degrees
         AutoChooser
 //        ShootingTests
 
@@ -82,14 +90,17 @@ object Robot : MeanlibRobot() {
     override suspend fun test()  {
         println("test mode begin. Hi.")
         //Drive.driveCircle()
-        canTest()
+//        canTest()
+        Drive.steeringTests()
+//        Drive.driveTests()
+//        Drive.setAngleOffsets()
     }
 
 
 
 
     override suspend fun disable() {
-        Drive.disable()
+//        Drive.disable()
         PowerInfo.disable()
         OI.operatorController.rumble = 0.0
 //        PowerDistribution.disable()

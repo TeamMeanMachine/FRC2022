@@ -1,7 +1,6 @@
 package org.team2471.frc2022.testing
 
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX
+import com.ctre.phoenix.sensors.CANCoder
 import org.team2471.frc.lib.coroutines.delay
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.framework.use
@@ -47,8 +46,27 @@ suspend fun Drive.currentTest() = use(this) {
 }
 
 suspend fun canTest() {
-    val basicMotor = WPI_TalonFX(6,"TestCanivore")
-    basicMotor.set(0.25)
-    delay(0.5)
-    basicMotor.set(0.0)
+//    val steerMotor = MotorController(FalconID(41,"TestCanivore"))
+//    val driveMotor = MotorController(FalconID(42,"TestCanivore"))
+
+    val turnMotor = (Drive.modules[0] as Drive.Module).turnMotor
+    val driveMotor = (Drive.modules[0] as Drive.Module).driveMotor
+
+    turnMotor.setPercentOutput(0.25)
+    delay(2.0)
+    turnMotor.setPercentOutput(0.0)
+    driveMotor.setPercentOutput(0.25)
+    delay(2.0)
+    driveMotor.setPercentOutput(0.0)
+
+    turnMotor.setPercentOutput(-0.25)
+    delay(2.0)
+    turnMotor.setPercentOutput(0.0)
+    driveMotor.setPercentOutput(-0.25)
+    delay(2.0)
+    driveMotor.setPercentOutput(0.0)
+
+    val canCoder = (Drive.modules[0] as Drive.Module).canCoder
+    println("Angle = ${canCoder.absolutePosition}")
+
 }
