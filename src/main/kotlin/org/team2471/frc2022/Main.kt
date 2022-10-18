@@ -3,6 +3,7 @@
 package org.team2471.frc2022
 
 import FRC____.BuildConfig
+import edu.wpi.first.cameraserver.CameraServer
 import edu.wpi.first.wpilibj.RobotBase
 import kotlinx.coroutines.DelicateCoroutinesApi
 import org.team2471.frc.lib.framework.MeanlibRobot
@@ -45,6 +46,7 @@ object Robot : MeanlibRobot() {
 //        ShootingTests
 
         PowerInfo
+        CameraServer.startAutomaticCapture()
     }
 
     override suspend fun enable() {
