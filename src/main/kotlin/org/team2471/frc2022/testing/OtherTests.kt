@@ -1,5 +1,6 @@
 package org.team2471.frc2022.testing
 
+import edu.wpi.first.networktables.NetworkTableInstance
 import org.team2471.frc.lib.coroutines.periodic
 import org.team2471.frc.lib.coroutines.suspendUntil
 import org.team2471.frc.lib.framework.use
@@ -39,5 +40,13 @@ suspend fun Drive.currentTest() = use(this) {
 //            0.0,
 //            false
 //        )
+    }
+}
+
+suspend fun Drive.testAprilTag() = use(this) {
+    val table = NetworkTableInstance.getDefault().getTable("photonvision")
+    val dataEntry = table.getEntry("rawBytes")
+    periodic {
+        println("AKJHFJKDHFJKSHF: ${dataEntry.getRaw(ByteArray(0))}")
     }
 }

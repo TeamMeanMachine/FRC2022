@@ -123,6 +123,8 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     override var robotPivot = Vector2(0.0, 0.0)
 
     override var headingSetpoint = 0.0.degrees
+    override val carpetFlow: Vector2
+        get() = TODO("Not yet implemented")
 
     override val parameters: SwerveParameters = SwerveParameters(
         gyroRateCorrection = 0.0,// 0.001,
@@ -134,7 +136,6 @@ object Drive : Subsystem("Drive"), SwerveDrive {
         kHeadingFeedForward = 0.001
     )
 
-    override val carpetFlow = if (DriverStation.getAlliance() == DriverStation.Alliance.Red) Vector2(0.0, 1.0) else Vector2(0.0, -1.0)
     override val kCarpet = 0.025 // how much downstream and upstream carpet directions affect the distance, for no effect, use  0.0 (2.5% more distance downstream)
     override val kTread = 0.0//.04 // how much of an effect treadWear has on distance (fully worn tread goes 4% less than full tread)  0.0 for no effect
 
