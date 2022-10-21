@@ -69,15 +69,14 @@ object Drive : Subsystem("Drive"), SwerveDrive {
      * **/
     override val modules: Array<SwerveDrive.Module> = arrayOf(
         Module(
-            MotorController(FalconID(Falcons.DRIVE_FRONTLEFT, "TestCanivore")),
-            MotorController(FalconID(Falcons.STEER_FRONTLEFT, "TestCanivore")),
+            MotorController(FalconID(Falcons.DRIVE_FRONTLEFT)),
+            MotorController(FalconID(Falcons.STEER_FRONTLEFT)),
             Vector2(-11.5, 14.0),
             Preferences.getDouble("Angle Offset 0",0.0).degrees,
             CANCoders.CANCODER_FRONTLEFT,
             odometer0Entry,
             "Angle Offset 0"
         ),
-
         Module(
             MotorController(FalconID(Falcons.DRIVE_FRONTRIGHT)),
             MotorController(FalconID(Falcons.STEER_FRONTRIGHT)),
@@ -375,6 +374,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             if (OI.driveRotation.absoluteValue > 0.001) {
                 turn = OI.driveRotation
             }
+
             printEncoderValues()
 
             headingSetpoint = OI.driverController.povDirection
