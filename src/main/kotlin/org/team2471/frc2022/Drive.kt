@@ -77,7 +77,6 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             odometer0Entry,
             "Angle Offset 0"
         ),
-
         Module(
             MotorController(FalconID(Falcons.DRIVE_FRONTRIGHT)),
             MotorController(FalconID(Falcons.STEER_FRONTRIGHT)),
@@ -375,6 +374,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
             if (OI.driveRotation.absoluteValue > 0.001) {
                 turn = OI.driveRotation
             }
+
             printEncoderValues()
 
             headingSetpoint = OI.driverController.povDirection
