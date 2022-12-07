@@ -69,8 +69,8 @@ object Drive : Subsystem("Drive"), SwerveDrive {
      * **/
     override val modules: Array<SwerveDrive.Module> = arrayOf(
         Module(
-            MotorController(FalconID(Falcons.DRIVE_FRONTLEFT, "TestCanivore")),
-            MotorController(FalconID(Falcons.STEER_FRONTLEFT, "TestCanivore")),
+            MotorController(FalconID(Falcons.DRIVE_FRONTLEFT)),
+            MotorController(FalconID(Falcons.STEER_FRONTLEFT)),
             Vector2(-11.5, 14.0),
             Preferences.getDouble("Angle Offset 0",0.0).degrees,
             CANCoders.CANCODER_FRONTLEFT,

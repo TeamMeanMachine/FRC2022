@@ -2,26 +2,32 @@
 
 package org.team2471.frc2022
 
-object Talons {
-
-}
-
-
+//object Talons {
+//
+//}
+//
+//
 object Sparks {
-
-
+    const val BUNNY_EXTEND = 10
 }
 
+
+object PWMServos {
+    const val BUNNY_PINCH_LEFT = 8
+    const val BUNNY_PINCH_RIGHT = 9
+}
+
+//
 object AnalogSensors {
-    const val SWERVE_FRONT_LEFT = 0
+    const val BUNNY_EXTEND = 0
     const val SWERVE_FRONT_RIGHT = 1
     const val SWERVE_BACK_RIGHT = 2
     const val SWERVE_BACK_LEFT = 3
 }
-object DigitalSensors {
-
-}
-
+//object DigitalSensors {
+//
+//}
+//
 object Falcons {
 
     const val DRIVE_FRONTLEFT = 12
@@ -44,7 +50,7 @@ object Falcons {
     const val DRIVE_SPARE1  = 53
     const val STEER_SPARE1 = 54*/
 }
-
+//
 object CANCoders {
     const val CANCODER_FRONTLEFT = 32
 

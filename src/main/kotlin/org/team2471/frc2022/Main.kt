@@ -54,6 +54,7 @@ object Robot : MeanlibRobot() {
 
         PowerInfo
         Drive
+        Bunny
     }
 
     override suspend fun enable() {
@@ -67,6 +68,7 @@ object Robot : MeanlibRobot() {
 //        zeroIntakePivot()
         println("ending enable")
         PowerInfo.enable()
+        Bunny.enable()
     }
 
     override suspend fun autonomous() {
@@ -104,6 +106,7 @@ object Robot : MeanlibRobot() {
     override suspend fun disable() {
         Drive.disable()
         PowerInfo.disable()
+        Bunny.disable()
         OI.operatorController.rumble = 0.0
 //        PowerDistribution.disable()
         //FrontLimelight.disable()
