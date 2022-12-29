@@ -124,7 +124,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 
     override var headingSetpoint = 0.0.degrees
     override val carpetFlow: Vector2
-        get() = TODO("Not yet implemented")
+        get() = Vector2(0.0, 1.0)
 
     override val parameters: SwerveParameters = SwerveParameters(
         gyroRateCorrection = 0.0,// 0.001,
