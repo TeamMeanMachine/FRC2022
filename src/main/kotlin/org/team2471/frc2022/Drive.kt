@@ -119,6 +119,8 @@ object Drive : Subsystem("Drive"), SwerveDrive {
     override var velocity = Vector2(0.0, 0.0)
 
     override var position = Vector2(0.0, -12.0)
+    override val combinedPosition: Vector2
+        get() = Vector2(0.0, 0.0)
 
     override var robotPivot = Vector2(0.0, 0.0)
 
@@ -266,7 +268,7 @@ object Drive : Subsystem("Drive"), SwerveDrive {
 
 
                 val currRadius = position.length
-                val currAngle = position.angle.radians
+                val currAngle = position.angle
                 radialVelocityEntry.setDouble(radialVelocity)
                 angularVelocityEntry.setDouble(angularVelocity)
                 radialVelocity = (currRadius - prevRadius) * 50.0
