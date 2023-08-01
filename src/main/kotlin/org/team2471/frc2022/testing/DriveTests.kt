@@ -116,7 +116,7 @@ suspend fun Drive.driveCircle() = use(Drive) {
         val dt = t - prevTime
 
         val currRadius = circlePosition.length
-        val currAngle = circlePosition.angle.radians
+        val currAngle = circlePosition.angle
 
         val goalAngle = currAngle + angleSpeed.degrees * dt
         val goalRadius = currRadius + radialSpeed * dt
@@ -144,7 +144,7 @@ suspend fun Drive.driveCircle() = use(Drive) {
         if (Limelight.hasValidTarget) {
             turn = aimPDController.update(Limelight.aimError)
         } else {
-            var error = (position.angle.radians - heading).wrap()
+            var error = (position.angle - heading).wrap()
             if (error.asDegrees.absoluteValue > 90.0) error = (error - 180.0.degrees).wrap()
             turn = aimPDController.update(error.asDegrees)
         }
