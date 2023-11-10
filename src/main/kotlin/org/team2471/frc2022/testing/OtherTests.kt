@@ -197,3 +197,18 @@ suspend fun Shooter.pitchFeedForwardTest() {
         lastPitch = pitch
     }
 }
+
+suspend fun conveyorUptakeTest() = use(Conveyor, Uptake) {
+    periodic {
+        if (OI.driverController.y) {
+            Uptake.uptakeMotor.setPercentOutput(1.0)
+        } else {
+            Uptake.uptakeMotor.setPercentOutput(0.0)
+        }
+        if (OI.driverController.a) {
+            Conveyor.conveyorMotor.setPercentOutput(1.0)
+        } else {
+            Conveyor.conveyorMotor.setPercentOutput(0.0)
+        }
+    }
+}

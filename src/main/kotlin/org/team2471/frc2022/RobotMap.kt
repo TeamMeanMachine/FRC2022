@@ -8,6 +8,8 @@ object Talons {
     const val BED_FEED = 2
     const val INTAKE = 17
     const val TALON_TEST_TWO = 3
+    const val BUNNY_CONVEYOR = 8
+    const val BUNNY_UPTAKE = 15
 }
 
 

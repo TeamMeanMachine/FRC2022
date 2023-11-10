@@ -143,11 +143,11 @@ object Shooter : Subsystem("Shooter") {
                 field = pitchSetpointEntry.getDouble(10.0)
             } else if (isKnownShot != knownShotType.NOTSET) {
                 field = when (isKnownShot) {
-                    knownShotType.FENDER -> 17.5
+                    knownShotType.FENDER -> 30.5
                     knownShotType.SAFE_FRONT -> 35.0
                     knownShotType.SAFE_BACK -> -19.0
                     knownShotType.WALL -> 35.0
-                    else -> 15.0
+                    else -> 30.0
                 }
             } else if (Feeder.isAuto && useAutoOdomEntry.getBoolean(false)) {
                 field = autoOdomPitch
@@ -158,7 +158,7 @@ object Shooter : Subsystem("Shooter") {
                 val tempPitch = frontPitchCurve.getValue(Limelight.distance.asFeet + distFlyOffset)
                 field = tempPitch
             } else {
-                field = 17.5
+                field = 30.0
             }
             // don't allow values outside of range even with offset
             field = field.coerceIn(PITCH_LOW - distFlyOffset, PITCH_HIGH - distFlyOffset)
@@ -191,33 +191,34 @@ object Shooter : Subsystem("Shooter") {
 //        get() = rpmFlyOffsetCurve.getValue(Drive.filteredRadialVelocity)
     var rpmSecondOffset = 0.0
     var rpmSetpoint: Double = 0.0 //demo
-        get() {
-            if (tuningMode) {
-                rpmSetpointEntry.getDouble(1300.0)
-            } else if (Feeder.isAuto && useAutoOdomEntry.getBoolean(false)) {
-                field = autoOdomRPM
-            } else if (isKnownShot != knownShotType.NOTSET) {
-                field = frontLLRPMOffset * when (isKnownShot) {
-                    knownShotType.FENDER -> 3200.0
-                    knownShotType.SAFE_FRONT -> 4000.0 //4200
-                    knownShotType.SAFE_BACK -> 3500.0
-                    knownShotType.WALL -> 3450.0
-                    else -> 3200.0
-                }
-            } else if (!Limelight.useFrontLimelight && Limelight.hasValidBackTarget) {
-                field = backRPMCurve.getValue(Limelight.distance.asFeet + distFlyOffset) * backLLRPMOffset
-            } else if (Limelight.useFrontLimelight && Limelight.hasValidFrontTarget) {
-                field = frontRPMCurve.getValue(Limelight.distance.asFeet + distFlyOffset) * frontLLRPMOffset
-            } else {
-                field = 3200.0
-            }
-//            field += rpmFlyOffset
-            field += rpmSecondOffset
-            if (!tuningMode) {
-                rpmSetpointEntry.setDouble(field)
-            }
-            return field
-        }
+        get() = 1900.0
+//        get() {
+//            if (tuningMode) {
+//                rpmSetpointEntry.getDouble(1300.0)
+//            } else if (Feeder.isAuto && useAutoOdomEntry.getBoolean(false)) {
+//                field = autoOdomRPM
+//            } else if (isKnownShot != knownShotType.NOTSET) {
+//                field = frontLLRPMOffset * when (isKnownShot) {
+//                    knownShotType.FENDER -> 3200.0
+//                    knownShotType.SAFE_FRONT -> 4000.0 //4200
+//                    knownShotType.SAFE_BACK -> 3500.0
+//                    knownShotType.WALL -> 3450.0
+//                    else -> 3200.0
+//                }
+//            } else if (!Limelight.useFrontLimelight && Limelight.hasValidBackTarget) {
+//                field = backRPMCurve.getValue(Limelight.distance.asFeet + distFlyOffset) * backLLRPMOffset
+//            } else if (Limelight.useFrontLimelight && Limelight.hasValidFrontTarget) {
+//                field = frontRPMCurve.getValue(Limelight.distance.asFeet + distFlyOffset) * frontLLRPMOffset
+//            } else {
+//                field = 3200.0
+//            }
+////            field += rpmFlyOffset
+//            field += rpmSecondOffset
+//            if (!tuningMode) {
+//                rpmSetpointEntry.setDouble(field)
+//            }
+//            return field
+//        }
 
     var rpm: Double
         get() = shootingMotorOne.velocity
@@ -402,7 +403,7 @@ object Shooter : Subsystem("Shooter") {
                 colorAlignedEntry.setBoolean(isCargoAlignedWithAlliance)
 
                 if (allGood && DriverStation.isTeleop()) {
-                    OI.driverController.rumble = 0.5
+                    OI.driverController.rumble = 0.0//0.5
                 }
 
                  //val detectedColor: Color = m_colorSensor.color
@@ -473,6 +474,7 @@ object Shooter : Subsystem("Shooter") {
 
     override fun onDisable() {
         OI.operatorController.rumble = 0.0
+        OI.driverController.rumble = 0.0
         super.onDisable()
     }
 

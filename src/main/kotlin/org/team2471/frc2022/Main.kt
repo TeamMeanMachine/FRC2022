@@ -49,6 +49,8 @@ object Robot : MeanlibRobot() {
         Limelight
         Climb
         PowerInfo
+        Uptake
+        Conveyor
     }
 
     override suspend fun enable() {
@@ -64,6 +66,8 @@ object Robot : MeanlibRobot() {
 //        zeroIntakePivot()
         println("ending enable")
         PowerInfo.enable()
+        Uptake.enable()
+        Conveyor.enable()
     }
 
     override suspend fun autonomous() {
@@ -88,7 +92,8 @@ object Robot : MeanlibRobot() {
 
     override suspend fun test()  {
         println("test mode begin. Hello.")
-        Drive.driveCircle()
+//        Drive.driveCircle()
+        conveyorUptakeTest()
     }
 
 
@@ -99,6 +104,8 @@ object Robot : MeanlibRobot() {
         Feeder.disable()
         Climb.disable()
         PowerInfo.disable()
+        Uptake.disable()
+        Conveyor.disable()
         OI.operatorController.rumble = 0.0
 //        PowerDistribution.disable()
         //FrontLimelight.disable()
