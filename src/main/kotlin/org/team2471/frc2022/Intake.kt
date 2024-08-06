@@ -119,9 +119,9 @@ object Intake : Subsystem("Intake") {
                     resetPivotOffset()
                     println("setpoints pivotAngle")
                     this.stop()
-                } else if (isCompBot) {
-                    println("Intake not reset")
-                }
+                } //else if (isCompBot) {
+                    //println("Intake not reset")
+                //}
 
 //                else {
 //                    intakePivotMotor.setRawOffset(PIVOT_BOTTOM.degrees)

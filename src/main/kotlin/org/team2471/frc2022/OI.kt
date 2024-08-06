@@ -1,5 +1,6 @@
 package org.team2471.frc2022
 
+import edu.wpi.first.wpilibj.util.Color
 import org.team2471.frc.lib.input.*
 import org.team2471.frc.lib.math.Vector2
 import org.team2471.frc.lib.math.cube
@@ -54,6 +55,10 @@ object OI {
         driverController::back.whenTrue { Drive.zeroGyro(); Drive.initializeSteeringMotors() }
         driverController::leftBumper.whenTrue { shootMode() }
         driverController::x.whenTrue { Drive.position = Vector2(0.0, -12.0) }
+
+        driverController::a.whenTrue { LedControl.setSolid(Color(255, 0, 0)) }
+        driverController::y.whenTrue { LedControl.setSolid(Color.kRed) }
+
 
         operatorController::start.whenTrue { climbPrep() }
         operatorController::b.whenTrue { intake() }
