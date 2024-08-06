@@ -49,6 +49,7 @@ object Robot : MeanlibRobot() {
         Limelight
         Climb
         PowerInfo
+        LedControl
     }
 
     override suspend fun enable() {
@@ -56,6 +57,7 @@ object Robot : MeanlibRobot() {
         Drive.enable()
         Intake.enable()
         Feeder.enable()
+        LedControl.enable()
         //FrontLimelight.enable()
 //        Drive.initializeSteeringMotors()
 //        ShootingTests.enable()
@@ -99,6 +101,7 @@ object Robot : MeanlibRobot() {
         Feeder.disable()
         Climb.disable()
         PowerInfo.disable()
+        LedControl.disable()
         OI.operatorController.rumble = 0.0
 //        PowerDistribution.disable()
         //FrontLimelight.disable()

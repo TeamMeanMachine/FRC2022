@@ -2,6 +2,11 @@
 
 package org.team2471.frc2022
 
+object Leds {
+    const val LED_PORT = 0
+    const val LED_LENGTH = 60
+}
+
 object Talons {
     const val PITCH = 7
     const val SHOOTER_FEED = 4

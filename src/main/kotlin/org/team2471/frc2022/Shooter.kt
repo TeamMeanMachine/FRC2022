@@ -204,11 +204,12 @@ object Shooter : Subsystem("Shooter") {
                     knownShotType.WALL -> 3450.0
                     else -> 3200.0
                 }
-            } else if (!Limelight.useFrontLimelight && Limelight.hasValidBackTarget) {
-                field = backRPMCurve.getValue(Limelight.distance.asFeet + distFlyOffset) * backLLRPMOffset
-            } else if (Limelight.useFrontLimelight && Limelight.hasValidFrontTarget) {
-                field = frontRPMCurve.getValue(Limelight.distance.asFeet + distFlyOffset) * frontLLRPMOffset
-            } else {
+            }// else if (!Limelight.useFrontLimelight && Limelight.hasValidBackTarget) {
+              //  field = backRPMCurve.getValue(Limelight.distance.asFeet + distFlyOffset) * backLLRPMOffset
+            //} else if (Limelight.useFrontLimelight && Limelight.hasValidFrontTarget) {
+              //  field = frontRPMCurve.getValue(Limelight.distance.asFeet + distFlyOffset) * frontLLRPMOffset
+            //}
+            else {
                 field = 3200.0
             }
 //            field += rpmFlyOffset

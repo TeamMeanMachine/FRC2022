@@ -14,7 +14,6 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import org.photonvision.PhotonCamera
-import org.photonvision.RobotPoseEstimator
 import org.team2471.frc.lib.coroutines.MeanlibDispatcher
 import org.team2471.frc.lib.coroutines.halt
 import org.team2471.frc.lib.coroutines.periodic
@@ -55,7 +54,7 @@ object Limelight : Subsystem("Front Limelight") {
     private var positionXEntry = combinedTable.getEntry("PositionX")
     private var positionYEntry = combinedTable.getEntry("PositionY")
     private var aimErrorEntry = combinedTable.getEntry("Aim Error")
-    val cam = PhotonCamera("camFront")
+//    val cam = PhotonCamera("camFront")
 
 //    var robotToCam: Transform3d = Transform3d(
 //        Translation3d(17.inches.asMeters, 8.5.inches.asMeters, 24.inches.asMeters),
